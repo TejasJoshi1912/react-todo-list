@@ -1,44 +1,80 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
-export default function ToDo(){
-    let [todos,seTodos] = useState ([{task:"sample-task",id :uuidv4()}]);
-    let[newTodo,setnewTodo] = useState("");
 
-    let addNewTask = () => {
-        seTodos((prevTodos)=>{
-            return [...todos,{task:newTodo,id:uuidv4()}];
-        });
-        setnewTodo ("")
-    }
-    let updateTodoValue = (event) =>{
-        setnewTodo(event.target.value);
-    } 
-    let deleteTodo =  (id) =>{
+export default function ToDo() {
+    const [todos, setTodos] = useState([
+        { task: "sample-task", id: uuidv4(), isDone: false }
+    ]);
 
-       seTodos((prevTodos)=>todos.filter((prevTodos)=>prevTodos.id!=id)
-) ;
-       
+    const [newTodo, setNewTodo] = useState("");
 
-    }
-    return(
-        <div>
-        <input placeholder="add a task" value={newTodo} onChange={updateTodoValue}></input>
-        <br /><br />
-        <button onClick={addNewTask}> Add Task </button>
-        <br /><br /><br />
+    const addNewTask = () => {
+        if (newTodo.trim() === "") return;
 
-        <hr />
-        <h4>Tasks Todo</h4>
-        <ul>
-            {todos.map((todo) =>(
-                <li key={todo.id}>
-                    <span>{todo.task}</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button onClick={()=>deleteTodo(todo.id)}>delete</button>
-                    </li>
+        setTodos((prevTodos) => [
+            ...prevTodos,
+            { task: newTodo, id: uuidv4(), isDone: false }
+        ]);
+
+        setNewTodo("");
+    };
+
+    const updateTodoValue = (event) => {
+        setNewTodo(event.target.value);
+    };
+
+    const deleteTodo = (id) => {
+        setTodos((prevTodos) =>
+            prevTodos.filter((todo) => todo.id !== id)
+        );
+    };
+
+    const markAsDoneOne = (id) => {
+        setTodos((prevTodos) =>
+            prevTodos.map((todo) =>
+                todo.id === id
+                    ? { ...todo, isDone: true }
+                    : todo
             )
-        )}
-        </ul>
+        );
+    };
+
+    return (
+        <div>
+            <input
+                placeholder="add a task"
+                value={newTodo}
+                onChange={updateTodoValue}
+            />
+            <br /><br />
+
+            <button onClick={addNewTask}>Add Task</button>
+
+            <br /><br /><hr />
+            <h4>Tasks Todo</h4>
+
+            <ul>
+                {todos.map((todo) => (
+                    <li key={todo.id}>
+                        <span
+                            style={{
+                                textDecoration: todo.isDone
+                                    ? "line-through"
+                                    : "none"
+                            }}
+                        >
+                            {todo.task}
+                        </span>
+                        &nbsp;&nbsp;
+                        <button onClick={() => deleteTodo(todo.id)}>
+                            delete
+                        </button>
+                        <button onClick={() => markAsDoneOne(todo.id)}>
+                            Mark as done
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
-}; 
+}
